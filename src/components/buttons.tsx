@@ -1,7 +1,11 @@
 import { FaEraser, FaLightbulb, FaUndo } from "react-icons/fa";
 import { useBoard } from "../logic/board.logic";
-import { useState } from "react";
 import { BsFillPencilFill, BsPencil } from "react-icons/bs";
+
+const btnClasses =
+  "flex-col flex items-center justify-center cursor-pointer transition-all p-1 active:bg-slate-800/80 hover:bg-slate-800 rounded-md";
+
+const iconTextClasses = "text-xs md:text-sm mt-1";
 
 export default function Buttons() {
   return (
@@ -15,38 +19,29 @@ export default function Buttons() {
 }
 
 function Eraser() {
-  const selectedCell = useBoard((s) => s.selectedCell);
   const setCellValue = useBoard((s) => s.setCellValue);
 
   return (
-    <div
-      onClick={() => setCellValue(selectedCell?.x, selectedCell?.y, null)}
-      className="flex-col flex items-center justify-center"
-    >
-      <FaEraser size={30} />
-      <p className="text-sm mt-1">Eraser</p>
+    <div onClick={() => setCellValue(null)} className={btnClasses}>
+      <FaEraser className="text-2xl md:text-4xl" />
+      <p className={iconTextClasses}>Eraser</p>
     </div>
   );
 }
 
 function Hint() {
-  const selectedCell = useBoard((s) => s.selectedCell);
-  const setCellValue = useBoard((s) => s.setCellValue);
-  const [hintCount, setHintCount] = useState(100);
+  const hintCount = useBoard((s) => s.hints);
+  const getHint = useBoard((s) => s.getHint);
 
   return (
     <div
       onClick={() => {
-        if (!selectedCell || !hintCount) return;
-        setCellValue(selectedCell.x, selectedCell.y, selectedCell.trueValue);
-        setHintCount((c) => c - 1);
+        getHint();
       }}
-      className={`flex-col flex items-center justify-center ${
-        !hintCount && "brightness-75"
-      }`}
+      className={`${btnClasses} ${!hintCount && "brightness-75"}`}
     >
-      <FaLightbulb size={30} />
-      <p className="text-sm mt-1">Hint ({hintCount})</p>
+      <FaLightbulb className="text-2xl md:text-4xl" />
+      <p className={iconTextClasses}>Hint ({hintCount})</p>
     </div>
   );
 }
@@ -56,12 +51,13 @@ function Pencil() {
   const togglePencilMode = useBoard((s) => s.togglePencilMode);
 
   return (
-    <div
-      onClick={togglePencilMode}
-      className="flex-col flex items-center justify-center"
-    >
-      {!pencilMode ? <BsPencil size={30} /> : <BsFillPencilFill size={30} />}
-      <p className="text-sm mt-1">Pencil</p>
+    <div onClick={togglePencilMode} className={btnClasses}>
+      {!pencilMode ? (
+        <BsPencil className="text-2xl md:text-4xl" />
+      ) : (
+        <BsFillPencilFill className="text-2xl md:text-4xl" />
+      )}
+      <p className={iconTextClasses}>Pencil</p>
     </div>
   );
 }
@@ -75,12 +71,10 @@ function Undo() {
   return (
     <div
       onClick={() => undo()}
-      className={`flex-col flex items-center justify-center ${
-        !canUndo && "brightness-75"
-      }`}
+      className={`${btnClasses}  ${!canUndo && "brightness-75"}`}
     >
-      <FaUndo size={30} />
-      <p className="text-sm mt-1">Undo</p>
+      <FaUndo className="text-2xl md:text-4xl" />
+      <p className={iconTextClasses}>Undo</p>
     </div>
   );
 }

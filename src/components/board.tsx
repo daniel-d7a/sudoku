@@ -6,7 +6,7 @@ export function Board() {
   const board = useBoard((s) => s.board);
 
   return (
-    <div className="size-[40rem] border-4 p-2 pb-4 border-gray-50 flex flex-col justify-between">
+    <div className="size-[19rem] md:size-[30rem]  rounded-2xl p-2 md:p-4 flex flex-col justify-between bg-slate-900">
       {board.map((_, rowIndex) => (
         <Fragment key={rowIndex}>
           <div className=" w-full h-20 flex justify-between">
@@ -43,11 +43,11 @@ function BoardCell({
   return (
     <div
       onClick={() => setSelectedCell(rowIndex, columnIndex)}
-      className={`border-yellow-400 size-16 grid text-3xl place-items-center 
+      className={`rounded bg-slate-800 size-7 md:size-10 grid  md:text-2xl place-items-center 
                     ${
                       value.x === selectedCell?.x && value.y === selectedCell?.y
-                        ? "border-4"
-                        : "border-2"
+                        ? "border-2"
+                        : ""
                     }
                     ${value.isDefault && "text-white"}
                     ${value.isValid() && !value.isDefault && "text-green-600"}
@@ -72,7 +72,7 @@ function PencilValues({ values }: { values: Array<number | null> }) {
   return (
     <div className="grid grid-cols-3 grid-rows-3 gap-x-1">
       {values.map((v) => (
-        <p className="text-sm col-span-1 row-span-1">{v}</p>
+        <p className="text-[0.5rem] leading-3 col-span-1 row-span-1">{v}</p>
       ))}
     </div>
   );

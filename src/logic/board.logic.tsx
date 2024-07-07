@@ -1,8 +1,6 @@
 import { Cell } from "../models/Cell";
 import { create } from "zustand";
 
-type MaybeNumber = number | undefined;
-
 export const Difficulties = {
   easy: 30,
   medium: 40,
@@ -11,34 +9,38 @@ export const Difficulties = {
 
 type Status = "playing" | "won" | "lost";
 
+type Board = Cell[][];
+
 type State = {
-  board: Cell[][];
+  board: Board;
   selectedCell: Cell | null;
   pencilMode: boolean;
   difficulty: number;
-  history: Array<Cell[][]>;
+  history: Array<Board>;
   startTime: Date | null;
   mistakes: number;
-  status: "playing" | "won" | "lost";
+  status: Status;
+  hints: number;
 };
 
 type Actions = {
-  setCellValue: (x: MaybeNumber, y: MaybeNumber, value: number | null) => void;
+  setCellValue: (value: number | null) => void;
   setSelectedCell: (x: number, y: number) => void;
   togglePencilMode: () => void;
-  togglePencilValue: (x: MaybeNumber, y: MaybeNumber, value: number) => void;
+  togglePencilValue: (value: number) => void;
   changeDifficulty: (difficulty: keyof typeof Difficulties) => void;
-  pushToHistory: (board: Cell[][]) => void;
+  pushToHistory: (board: Board) => void;
   undo: () => void;
   setStartTime: (time: Date) => void;
   addMistake: () => void;
   setStatus: (status: Status) => void;
+  getHint: () => void;
 };
 
 const initailBoard = generateBoard();
 const start = new Date();
 
-export const useBoard = create<State & Actions>((set) => ({
+export const useBoard = create<State & Actions>((set, get) => ({
   board: initailBoard,
   selectedCell: null,
   pencilMode: false,
@@ -47,30 +49,42 @@ export const useBoard = create<State & Actions>((set) => ({
   startTime: start,
   mistakes: 0,
   status: "playing",
+  hints: 100,
+
+  getHint: () => {
+    if (get().hints === 0) return;
+
+    get().setCellValue(get().selectedCell?.trueValue || null);
+
+    return set((state) => ({
+      hints: state.hints - 1,
+    }));
+  },
 
   addMistake: () => set((state) => ({ mistakes: state.mistakes + 1 })),
 
   setStatus: (status) => set({ status }),
 
-  setStartTime: (time) => set({ startTime: time }),
+  setStartTime: (startTime) => set({ startTime }),
 
   changeDifficulty: (difficulty) => {
-    return set(() => {
-      const newBoard = generateBoard(Difficulties[difficulty]);
-      return {
-        difficulty: Difficulties[difficulty],
-        board: newBoard,
-        history: [newBoard],
-        startTime: new Date(),
-        mistakes: 0,
-        status: "playing",
-        pencilMode: false,
-        selectedCell: null,
-      };
-    });
+    const newBoard = generateBoard(Difficulties[difficulty]);
+    return set(() => ({
+      difficulty: Difficulties[difficulty],
+      board: newBoard,
+      history: [newBoard],
+      startTime: new Date(),
+      mistakes: 0,
+      status: "playing",
+      pencilMode: false,
+      selectedCell: null,
+    }));
   },
-  setCellValue: (x, y, value) => {
-    if (x == null || y == null) return;
+  setCellValue: (value) => {
+    const cell = get().selectedCell;
+
+    if (!cell) return;
+    const { x, y } = cell;
 
     set((state) => {
       const board = state.board;
@@ -84,10 +98,9 @@ export const useBoard = create<State & Actions>((set) => ({
           if (j !== y) return cell;
 
           const newCell = new Cell(x, y, value, cell.trueValue, false);
-          if (!newCell.isValid()) {
+          if (value !== null && !newCell.isValid()) {
             state.addMistake();
           }
-
           return newCell;
         });
       });
@@ -112,8 +125,11 @@ export const useBoard = create<State & Actions>((set) => ({
     });
   },
   togglePencilMode: () => set((state) => ({ pencilMode: !state.pencilMode })),
-  togglePencilValue: (x, y, value) => {
-    if (x == null || y == null) return;
+  togglePencilValue: (value) => {
+    const cell = get().selectedCell;
+
+    if (!cell) return;
+    const { x, y } = cell;
 
     set((state) => {
       const board = state.board;
@@ -142,7 +158,7 @@ export const useBoard = create<State & Actions>((set) => ({
     });
   },
 
-  pushToHistory: (board: Cell[][]) => {
+  pushToHistory: (board: Board) => {
     set((state) => ({ history: [...state.history, board] }));
   },
   undo: () => {

@@ -24,11 +24,11 @@ export default function Timer() {
   if (!startTime) return <div>00:00</div>;
 
   return (
-    <div>
+    <p className="text-sm">
       {minutes.toString().padStart(2, "0") +
         ":" +
         seconds.toString().padStart(2, "0")}
-    </div>
+    </p>
 
     // 01
   );

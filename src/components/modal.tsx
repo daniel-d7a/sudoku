@@ -17,7 +17,7 @@ export default function Modal() {
           className={`w-5/6 h-2/5 lg:w-1/2 rounded-lg text-black bg-slate-200/80 grid place-content-center `}
         >
           <p className="text-3xl md:text-6xl mb-8">
-            you {status === "won" ? "won 🥳" : "lost 😥"}
+            you {status === "won" ? "won 🥳" : "lost 😂"}
           </p>
           <button
             onClick={() => changeDifficulty("easy")}

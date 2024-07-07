@@ -1,37 +1,32 @@
 import { useBoard } from "../logic/board.logic";
-import ReactModal from "react-modal";
 
 export default function Modal() {
   const status = useBoard((s) => s.status);
   const changeDifficulty = useBoard((s) => s.changeDifficulty);
 
   const modalOpen = status === "won" || status === "lost";
-  
+
   return (
-    <ReactModal
-      ariaHideApp={false}
-      isOpen={modalOpen}
-      style={{
-        overlay: {
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-        },
-        content: {
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          display: "grid",
-          placeItems: "center",
-        },
-      }}
-    >
-      <div className="flex flex-col items-center justify-center">
-        <p className="text-[10rem]">you {status}</p>
-        <br />
-        <button
-          onClick={() => changeDifficulty("easy")}
-          className="text-3xl border rounded px-3 py-2"
+    <>
+      <div
+        className={`z-50 back transition-all fixed top-0 left-0 w-full h-full flex items-center justify-center ${
+          modalOpen ? "backdrop-blur visible" : "backdrop-blur-none invisible"
+        }`}
+      >
+        <div
+          className={`w-5/6 h-2/5 lg:w-1/2 rounded-lg text-black bg-slate-200/80 grid place-content-center `}
         >
-          play again
-        </button>
+          <p className="text-3xl md:text-6xl mb-8">
+            you {status === "won" ? "won 🥳" : "lost 😥"}
+          </p>
+          <button
+            onClick={() => changeDifficulty("easy")}
+            className=" md:text-2xl border-2 md:border-4 border-black hover:bg-slate-200/70 active:bg-slate-200/80 transition-all rounded-full px-3 py-2"
+          >
+            play again
+          </button>
+        </div>
       </div>
-    </ReactModal>
+    </>
   );
 }

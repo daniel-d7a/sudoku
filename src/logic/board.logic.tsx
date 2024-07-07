@@ -48,7 +48,7 @@ export const useBoard = create<State & Actions>((set, get) => ({
   history: [initailBoard],
   startTime: start,
   mistakes: 0,
-  status: "playing",
+  status: "won",
   hints: 100,
 
   getHint: () => {
